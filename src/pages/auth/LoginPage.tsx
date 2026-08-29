@@ -1,4 +1,38 @@
+import {useState} from "react";
+import {useMutation} from "@tanstack/react-query";
+import { login } from '../../api/auth/AuthApi';
+import { useNavigate } from 'react-router-dom';
+
+
 const LoginPage = () => {
+    const navigate = useNavigate();
+    const [loginId, setLoginId] = useState('');
+    const [password, setPassword] = useState('');
+
+    const loginMutation = useMutation({
+        mutationFn: login,
+
+        onSuccess: (data) => {
+            console.log('로그인 성공', data);
+
+            navigate('/dashboard');
+        },
+
+        onError: (error) => {
+            console.error('로그인 실패', error);
+            alert('아이디 또는 비밀번호를 확인해주세요.');
+        },
+    });
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        loginMutation.mutate({
+            loginId,
+            password,
+        });
+    };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f7f8fa] px-4">
       <div className="w-full max-w-[400px]">
@@ -26,18 +60,20 @@ const LoginPage = () => {
             </p>
           </div>
 
-           <form className="space-y-5">
+           <form className="space-y-5"  onSubmit={handleSubmit}>
             <div>
                 <label
-                htmlFor="email"
+                htmlFor="text"
                 className="mb-2 block text-sm font-semibold text-[#4e5968]"
                 >
                 아이디
                 </label>
 
                 <input
-                id="email"
-                type="email"
+                id="loginId"
+                type="text"
+                value={loginId}
+                onChange={(e) => setLoginId(e.target.value)}
                 placeholder="아이디를 입력해주세요"
                 className="h-12 w-full rounded-xl border border-[#e5e8eb] px-4 text-sm outline-none transition placeholder:text-[#b0b8c1] focus:border-[#3182f6] focus:ring-4 focus:ring-[#3182f6]/10"
                 />
@@ -54,6 +90,8 @@ const LoginPage = () => {
                 <input
                 id="password"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="비밀번호를 입력해주세요"
                 className="h-12 w-full rounded-xl border border-[#e5e8eb] px-4 text-sm outline-none transition placeholder:text-[#b0b8c1] focus:border-[#3182f6] focus:ring-4 focus:ring-[#3182f6]/10"
                 />
@@ -71,9 +109,10 @@ const LoginPage = () => {
 
             <button
                 type="submit"
+                disabled={loginMutation.isPending}
                 className="h-12 w-full rounded-xl bg-[#191f28] text-sm font-bold text-white transition hover:bg-[#333d4b]"
             >
-                로그인
+                {loginMutation.isPending ? '로그인 중...' : '로그인'}
             </button>
             </form>
         </div>
