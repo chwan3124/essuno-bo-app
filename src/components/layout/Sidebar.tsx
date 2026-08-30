@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { logout } from '../../api/auth/AuthApi'
 
 const menuItems = [
   { label: '대시보드', path: '/' },
@@ -9,7 +11,21 @@ const menuItems = [
 ]
 
 const Sidebar = () => {
-  return (
+  const navigate = useNavigate()
+
+ 
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      navigate('/login')
+    },
+    onError: (error) => {
+      console.error('로그아웃 실패:', error)
+    },
+  })
+
+  
+   return (
     <aside className="fixed left-0 top-0 flex h-screen w-60 flex-col border-r border-[#e5e8eb] bg-white">
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-[#f0f1f3] px-6">
@@ -59,6 +75,8 @@ const Sidebar = () => {
 
           <button
             type="button"
+            onClick={() => logoutMutation.mutate()}
+            disabled={logoutMutation.isPending}
             className="text-xs text-[#8b95a1] hover:text-[#191f28]"
           >
             로그아웃
