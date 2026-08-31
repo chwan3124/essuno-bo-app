@@ -1,73 +1,27 @@
+import { useQuery } from '@tanstack/react-query'
 import MainLayout from '../../components/layout/MainLayout'
+import { getProducts, type ProductItem } from '../../api/product/ProductApi'
 
-interface Product {
-  id: number
-  name: string
-  category: string
-  price: number
-  stock: number
-  status: '판매중' | '품절' | '판매중지'
-  createdAt: string
-}
-
-const products: Product[] = [
-  {
-    id: 1,
-    name: 'ESSUNO Oversized T-Shirt',
-    category: '상의',
-    price: 39000,
-    stock: 128,
-    status: '판매중',
-    createdAt: '2026.08.25',
-  },
-  {
-    id: 2,
-    name: 'ESSUNO Wide Denim',
-    category: '하의',
-    price: 79000,
-    stock: 54,
-    status: '판매중',
-    createdAt: '2026.08.24',
-  },
-  {
-    id: 3,
-    name: 'ESSUNO Basic Hoodie',
-    category: '상의',
-    price: 69000,
-    stock: 0,
-    status: '품절',
-    createdAt: '2026.08.23',
-  },
-  {
-    id: 4,
-    name: 'ESSUNO Nylon Jacket',
-    category: '아우터',
-    price: 129000,
-    stock: 32,
-    status: '판매중',
-    createdAt: '2026.08.22',
-  },
-  {
-    id: 5,
-    name: 'ESSUNO Cargo Pants',
-    category: '하의',
-    price: 89000,
-    stock: 21,
-    status: '판매중',
-    createdAt: '2026.08.21',
-  },
-  {
-    id: 6,
-    name: 'ESSUNO Logo Cap',
-    category: '잡화',
-    price: 29000,
-    stock: 0,
-    status: '판매중지',
-    createdAt: '2026.08.20',
-  },
-]
 
 const ProductListPage = () => {
+  const {
+    data: products = [],
+    isLoading,
+  } = useQuery<ProductItem[]>({
+    queryKey: ['products'],
+    queryFn: getProducts
+  })
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="p-8">
+          상품 목록을 불러오는 중...
+        </div>
+      </MainLayout>
+    )
+  }
+
   return (
     <MainLayout>
       <div className="p-8">
@@ -130,7 +84,7 @@ const ProductListPage = () => {
         <div className="mt-5 overflow-hidden rounded-2xl border border-[#e5e8eb] bg-white">
           <div className="flex items-center justify-between border-b border-[#f0f1f3] px-6 py-4">
             <p className="text-sm font-semibold text-[#333d4b]">
-              전체 상품 <span className="text-[#3182f6]">6</span>
+              전체 상품 <span className="text-[#3182f6]">{products.length}</span>
             </p>
 
             <select className="rounded-lg border border-[#e5e8eb] px-3 py-2 text-sm text-[#6b7684] outline-none">
