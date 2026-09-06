@@ -14,3 +14,8 @@ export const getProducts = async (): Promise<ProductItem[]> => {
     const response = await ApiClient.get<ProductItem[]>('/api/products');
     return response.data.data;
 }
+
+export const getProduct = async (id: number): Promise<ProductItem> => {
+    const response = await ApiClient.get<ProductItem>(`/api/product/${id}`);
+    return response.data.data;
+}

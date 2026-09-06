@@ -1,10 +1,41 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import MainLayout from '../../components/layout/MainLayout'
+import { useQuery } from '@tanstack/react-query'
+import { getProduct, type ProductItem } from '../../api/product/ProductApi'
 
 const ProductDetailPage = () => {
   const navigate = useNavigate()
   const { productId } = useParams()
+  console.log(productId)
 
+  const {
+    data: product,
+    isLoading,
+  } = useQuery<ProductItem>({
+    queryKey: ['product', productId],
+    queryFn: () => getProduct(Number(productId)),
+    enabled: !!productId,
+  })
+
+  if (isLoading) {
+    return (
+      <MainLayout> 
+        <div className="p-8"> 
+          상품 정보를 불러오는 중... 
+        </div> 
+      </MainLayout > 
+    )
+  }
+
+  if (!product) {
+    return (
+      <MainLayout> 
+        <div className="p-8"> 
+          상품을 찾을 수 없습니다.
+        </div> 
+      </MainLayout > 
+    )
+  }
   return (
     <MainLayout>
       <div className="p-8">
@@ -84,7 +115,7 @@ const ProductDetailPage = () => {
 
                 <input
                   type="text"
-                  defaultValue="ESSUNO Oversized T-Shirt"
+                  defaultValue={product.name}
                   className="h-11 w-full rounded-lg border border-[#e5e8eb] px-4 text-sm outline-none focus:border-[#3182f6]"
                 />
               </div>
@@ -95,7 +126,9 @@ const ProductDetailPage = () => {
                     카테고리
                   </label>
 
-                  <select className="h-11 w-full rounded-lg border border-[#e5e8eb] bg-white px-3 text-sm outline-none focus:border-[#3182f6]">
+                  <select 
+                    defaultValue={product.category}
+                    className="h-11 w-full rounded-lg border border-[#e5e8eb] bg-white px-3 text-sm outline-none focus:border-[#3182f6]">
                     <option>상의</option>
                     <option>하의</option>
                     <option>아우터</option>
@@ -125,7 +158,7 @@ const ProductDetailPage = () => {
                   <div className="relative">
                     <input
                       type="number"
-                      defaultValue={39000}
+                      defaultValue={product.price}
                       className="h-11 w-full rounded-lg border border-[#e5e8eb] px-4 pr-12 text-sm outline-none focus:border-[#3182f6]"
                     />
 
@@ -143,7 +176,7 @@ const ProductDetailPage = () => {
                   <div className="relative">
                     <input
                       type="number"
-                      defaultValue={128}
+                      defaultValue={product.stock}
                       className="h-11 w-full rounded-lg border border-[#e5e8eb] px-4 pr-12 text-sm outline-none focus:border-[#3182f6]"
                     />
 

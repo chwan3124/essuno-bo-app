@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import MainLayout from '../../components/layout/MainLayout'
 import { getProducts, type ProductItem } from '../../api/product/ProductApi'
+import { useNavigate } from 'react-router-dom';
 
 
 const ProductListPage = () => {
+  const navigate = useNavigate();
+
   const {
     data: products = [],
     isLoading,
@@ -115,7 +118,8 @@ const ProductListPage = () => {
               {products.map((product) => (
                 <tr
                   key={product.id}
-                  className="border-b border-[#f0f1f3] last:border-0 hover:bg-[#fafbfc]"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                  className="border-b border-[#f0f1f3] last:border-0 hover:bg-[#fafbfc] cursor-pointer"
                 >
                   <td className="px-6 py-5">
                     <input type="checkbox" />
@@ -168,7 +172,7 @@ const ProductListPage = () => {
                   <td className="px-6 py-5">
                     <button
                       type="button"
-                      className="text-sm font-medium text-[#6b7684] hover:text-[#191f28]"
+                      className="text-sm font-medium text-[#6b7684] hover:text-[#191f28]  cursor-pointer"
                     >
                       수정
                     </button>
