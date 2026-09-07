@@ -19,3 +19,18 @@ export const getProduct = async (id: number): Promise<ProductItem> => {
     const response = await ApiClient.get<ProductItem>(`/api/product/${id}`);
     return response.data.data;
 }
+
+export interface UpdateProductRequest {
+  name: string
+  category: string
+  price: number
+  stock: number
+}
+
+export const updateProduct = async (
+  id: number,
+  data: UpdateProductRequest
+) => {
+  const response = await ApiClient.patch(`/api/product/${id}`, data)
+  return response.data
+}

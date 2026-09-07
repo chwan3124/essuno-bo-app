@@ -1,12 +1,18 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import MainLayout from '../../components/layout/MainLayout'
-import { useQuery } from '@tanstack/react-query'
-import { getProduct, type ProductItem } from '../../api/product/ProductApi'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { getProduct, type ProductItem, updateProduct } from '../../api/product/ProductApi'
+import { useState, useEffect } from 'react'
+
 
 const ProductDetailPage = () => {
   const navigate = useNavigate()
   const { productId } = useParams()
-  console.log(productId)
+
+  const [name, setName] = useState('')
+  const [category, setCategory] = useState('')
+  const [price, setPrice] = useState(0)
+  const [stock, setStock] = useState(0)
 
   const {
     data: product,
@@ -15,6 +21,33 @@ const ProductDetailPage = () => {
     queryKey: ['product', productId],
     queryFn: () => getProduct(Number(productId)),
     enabled: !!productId,
+  })
+
+  useEffect(() => {
+    if (product) {
+      setName(product.name)
+      setCategory(product.category)
+      setPrice(product.price)
+      setStock(product.stock)
+    }
+  }, [product])
+
+  const updateMutation = useMutation({
+    mutationFn: () => updateProduct(Number(productId), {
+      name,
+      category,
+      price,
+      stock
+    }),
+
+    onSuccess: () => {
+      alert('상품이 수정되었습니다.')
+      navigate('/products')
+    },
+
+    onError: () => {
+      alert('상품 수정에 실패하였습니다.')
+    }
   })
 
   if (isLoading) {
@@ -70,6 +103,8 @@ const ProductDetailPage = () => {
 
             <button
               type="button"
+              onClick={() => updateMutation.mutate()}
+              disabled={updateMutation.isPending}
               className="rounded-xl bg-[#191f28] px-5 py-3 text-sm font-semibold text-white hover:bg-[#333d4b]"
             >
               저장
@@ -115,7 +150,8 @@ const ProductDetailPage = () => {
 
                 <input
                   type="text"
-                  defaultValue={product.name}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="h-11 w-full rounded-lg border border-[#e5e8eb] px-4 text-sm outline-none focus:border-[#3182f6]"
                 />
               </div>
@@ -127,8 +163,9 @@ const ProductDetailPage = () => {
                   </label>
 
                   <select 
-                    defaultValue={product.category}
-                    className="h-11 w-full rounded-lg border border-[#e5e8eb] bg-white px-3 text-sm outline-none focus:border-[#3182f6]">
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="h-11 w-full rounded-lg border border-[#e5e8eb] bg-white px-3 text-sm outline-none focus:border-[#3182f6]">
                     <option>상의</option>
                     <option>하의</option>
                     <option>아우터</option>
@@ -158,7 +195,8 @@ const ProductDetailPage = () => {
                   <div className="relative">
                     <input
                       type="number"
-                      defaultValue={product.price}
+                      value={price}
+                      onChange={(e) => setPrice(Number(e.target.value))}
                       className="h-11 w-full rounded-lg border border-[#e5e8eb] px-4 pr-12 text-sm outline-none focus:border-[#3182f6]"
                     />
 
@@ -175,8 +213,8 @@ const ProductDetailPage = () => {
 
                   <div className="relative">
                     <input
-                      type="number"
-                      defaultValue={product.stock}
+                      value={stock}
+                      onChange={(e) => setStock(Number(e.target.value))}
                       className="h-11 w-full rounded-lg border border-[#e5e8eb] px-4 pr-12 text-sm outline-none focus:border-[#3182f6]"
                     />
 
@@ -326,6 +364,8 @@ const ProductDetailPage = () => {
 
             <button
               type="button"
+              onClick={() => updateMutation.mutate()}
+              disabled={updateMutation.isPending}
               className="rounded-xl bg-[#191f28] px-6 py-3 text-sm font-semibold text-white hover:bg-[#333d4b]"
             >
               저장
