@@ -11,6 +11,7 @@ import MemberListPage from './pages/member/MemberListPage'
 import MemberDetailPage from './pages/member/MemberDetailPage'
 import ReviewListPage from './pages/review/ReviewListPage'
 import ReviewDetailPage from './pages/review/ReviewDetailPage'
+import ProductCreatePage from './pages/product/ProductCreatePage'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/products" element={<ProductListPage />} />
       <Route path="/product/:productId" element={<ProductDetailPage />} />
+      <Route path="/product/create" element={<ProductCreatePage />} />
       <Route path="/orders" element={<OrderListPage />} />
       <Route path="/order/:id" element={<OrderDetailPage />} />
       <Route path="/members" element={<MemberListPage />} />

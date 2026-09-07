@@ -34,3 +34,18 @@ export const updateProduct = async (
   const response = await ApiClient.patch(`/api/product/${id}`, data)
   return response.data
 }
+
+
+export interface CreateProductRequest {
+    name: string
+    category: string
+    price: number
+    stock: number
+}
+
+export const createProduct = async (
+    data: CreateProductRequest
+) => {
+    const response = await ApiClient.post(`/api/product`, data)
+    return response.data
+}

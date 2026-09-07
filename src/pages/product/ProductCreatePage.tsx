@@ -1,39 +1,19 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import MainLayout from '../../components/layout/MainLayout'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { getProduct, type ProductItem, updateProduct } from '../../api/product/ProductApi'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { createProduct } from '../../api/product/ProductApi'
 
 
-const ProductDetailPage = () => {
+const ProductCreatePage = () => {
   const navigate = useNavigate()
-  const { productId } = useParams()
-
   const [name, setName] = useState('')
   const [category, setCategory] = useState('')
   const [price, setPrice] = useState(0)
   const [stock, setStock] = useState(0)
 
-  const {
-    data: product,
-    isLoading,
-  } = useQuery<ProductItem>({
-    queryKey: ['product', productId],
-    queryFn: () => getProduct(Number(productId)),
-    enabled: !!productId,
-  })
-
-  useEffect(() => {
-    if (product) {
-      setName(product.name)
-      setCategory(product.category)
-      setPrice(product.price)
-      setStock(product.stock)
-    }
-  }, [product])
-
-  const updateMutation = useMutation({
-    mutationFn: () => updateProduct(Number(productId), {
+  const createMutation = useMutation({
+    mutationFn: () => createProduct({
       name,
       category,
       price,
@@ -41,34 +21,16 @@ const ProductDetailPage = () => {
     }),
 
     onSuccess: () => {
-      alert('상품이 수정되었습니다.')
+      alert('상품이 생성되었습니다.')
       navigate('/products')
     },
-
+    
     onError: () => {
-      alert('상품 수정에 실패하였습니다.')
+      alert('상품 생성에 실패하였습니다.')
     }
   })
 
-  if (isLoading) {
-    return (
-      <MainLayout> 
-        <div className="p-8"> 
-          상품 정보를 불러오는 중... 
-        </div> 
-      </MainLayout > 
-    )
-  }
 
-  if (!product) {
-    return (
-      <MainLayout> 
-        <div className="p-8"> 
-          상품을 찾을 수 없습니다.
-        </div> 
-      </MainLayout > 
-    )
-  }
   return (
     <MainLayout>
       <div className="p-8">
@@ -95,7 +57,6 @@ const ProductDetailPage = () => {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => navigate('/products')}
               className="rounded-xl border border-[#e5e8eb] bg-white px-5 py-3 text-sm font-semibold text-[#4e5968] hover:bg-[#f7f8fa]"
             >
               취소
@@ -103,9 +64,9 @@ const ProductDetailPage = () => {
 
             <button
               type="button"
-              onClick={() => updateMutation.mutate()}
-              disabled={updateMutation.isPending}
-              className="rounded-xl bg-[#191f28] px-5 py-3 text-sm font-semibold text-white hover:bg-[#333d4b] cursor-pointer"
+              onClick={() => createMutation.mutate()}
+              disabled={createMutation.isPending}
+              className="rounded-xl bg-[#191f28] px-6 py-3 text-sm font-semibold text-white hover:bg-[#333d4b] cursor-pointer"
             >
               저장
             </button>
@@ -324,7 +285,6 @@ const ProductDetailPage = () => {
             <div>
               <p className="text-[#8b95a1]">상품 번호</p>
               <p className="mt-2 font-medium text-[#333d4b]">
-                #{productId ?? '00001'}
               </p>
             </div>
 
@@ -364,8 +324,8 @@ const ProductDetailPage = () => {
 
             <button
               type="button"
-              onClick={() => updateMutation.mutate()}
-              disabled={updateMutation.isPending}
+              onClick={() => createMutation.mutate()}
+              disabled={createMutation.isPending}
               className="rounded-xl bg-[#191f28] px-6 py-3 text-sm font-semibold text-white hover:bg-[#333d4b] cursor-pointer"
             >
               저장
@@ -377,4 +337,4 @@ const ProductDetailPage = () => {
   )
 }
 
-export default ProductDetailPage
+export default ProductCreatePage

@@ -42,7 +42,8 @@ const ProductListPage = () => {
 
           <button
             type="button"
-            className="rounded-xl bg-[#191f28] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#333d4b]"
+            onClick={() => navigate('/product/create')}
+            className="rounded-xl bg-[#191f28] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#333d4b] cursor-pointer"
           >
             상품 등록
           </button>
