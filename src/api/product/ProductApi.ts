@@ -10,8 +10,14 @@ export interface ProductItem{
     createdAt: string,
 }
 
-export const getProducts = async (): Promise<ProductItem[]> => {
-    const response = await ApiClient.get<ProductItem[]>('/api/products');
+export interface ProductListView{
+    totalCount: number;
+    totalPage: number;
+    products: ProductItem[];
+}
+
+export const getProducts = async (page:number): Promise<ProductListView> => {
+    const response = await ApiClient.get<ProductListView>(`/api/products?page=${page}`);
     return response.data.data;
 }
 

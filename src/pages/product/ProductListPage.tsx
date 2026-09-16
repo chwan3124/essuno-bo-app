@@ -1,18 +1,25 @@
 import { useQuery } from '@tanstack/react-query'
 import MainLayout from '../../components/layout/MainLayout'
-import { getProducts, type ProductItem } from '../../api/product/ProductApi'
+import { getProducts, type ProductListView } from '../../api/product/ProductApi'
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import Pagination from '../../components/Pagination';
 
 
 const ProductListPage = () => {
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
 
   const {
-    data: products = [],
+    data: productListView = {
+      products: [],
+      totalPage: 0,
+      totalCount: 0,
+    },
     isLoading,
-  } = useQuery<ProductItem[]>({
-    queryKey: ['products'],
-    queryFn: getProducts
+  } = useQuery<ProductListView>({
+    queryKey: ['productListView', page],
+    queryFn: () => getProducts(page -1)
   })
 
   if (isLoading) {
@@ -88,7 +95,7 @@ const ProductListPage = () => {
         <div className="mt-5 overflow-hidden rounded-2xl border border-[#e5e8eb] bg-white">
           <div className="flex items-center justify-between border-b border-[#f0f1f3] px-6 py-4">
             <p className="text-sm font-semibold text-[#333d4b]">
-              전체 상품 <span className="text-[#3182f6]">{products.length}</span>
+              전체 상품 <span className="text-[#3182f6]">{productListView.totalCount}</span>
             </p>
 
             <select className="rounded-lg border border-[#e5e8eb] px-3 py-2 text-sm text-[#6b7684] outline-none">
@@ -116,7 +123,7 @@ const ProductListPage = () => {
             </thead>
 
             <tbody>
-              {products.map((product) => (
+              {productListView.products.map((product) => (
                 <tr
                   key={product.id}
                   onClick={() => navigate(`/product/${product.id}`)}
@@ -163,7 +170,7 @@ const ProductListPage = () => {
                   </td>
 
                   <td className="px-4 py-5">
-                    <StatusBadge status={product.status} />
+                    판매중
                   </td>
 
                   <td className="px-4 py-5 text-[#8b95a1]">
@@ -184,50 +191,13 @@ const ProductListPage = () => {
           </table>
 
           {/* Pagination */}
-          <div className="flex items-center justify-center gap-2 border-t border-[#f0f1f3] px-6 py-5">
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#191f28] text-xs font-semibold text-white">
-              1
-            </button>
-
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-[#6b7684] hover:bg-[#f2f4f6]">
-              2
-            </button>
-
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-[#6b7684] hover:bg-[#f2f4f6]">
-              3
-            </button>
-
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-[#6b7684] hover:bg-[#f2f4f6]">
-              4
-            </button>
-
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-[#6b7684] hover:bg-[#f2f4f6]">
-              5
-            </button>
-          </div>
+          <Pagination
+            currentPage={page}
+            totalPage={productListView.totalPage}
+            onPageChange={setPage}/>
         </div>
       </div>
     </MainLayout>
-  )
-}
-
-const StatusBadge = ({
-  status,
-}: {
-  status: Product['status']
-}) => {
-  const styles = {
-    판매중: 'bg-[#e8f3ff] text-[#3182f6]',
-    품절: 'bg-[#fff0f0] text-[#f04452]',
-    판매중지: 'bg-[#f2f4f6] text-[#6b7684]',
-  }
-
-  return (
-    <span
-      className={`inline-flex rounded-md px-2.5 py-1 text-xs font-semibold ${styles[status]}`}
-    >
-      {status}
-    </span>
   )
 }
 
