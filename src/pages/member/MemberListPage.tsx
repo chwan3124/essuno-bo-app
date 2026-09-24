@@ -1,4 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
 import MainLayout from '../../components/layout/MainLayout'
+import { getMembers, type MemberListView } from '../../api/member/MemberApi'
+import { useState } from 'react'
+import Pagination from '../../components/Pagination'
 
 interface Member {
   id: number
@@ -93,6 +97,30 @@ const members: Member[] = [
 ]
 
 const MemberListPage = () => {
+  const [page, setPage] = useState(1)
+
+  const {
+    data: memberListView = {
+      members: [],
+      totalCount: 0,
+      totalPage: 0
+    },
+    isLoading
+  } = useQuery<MemberListView>({
+    queryKey: ['memberListView', page],
+    queryFn: () => getMembers(page - 1)
+  })
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="p-8">
+          회원 목록을 불러오는 중...
+        </div>
+      </MainLayout>
+    )
+  }
+
   return (
     <MainLayout>
       <div className="p-8">
@@ -237,7 +265,7 @@ const MemberListPage = () => {
             </thead>
 
             <tbody>
-              {members.map((member) => (
+              {memberListView.members.map((member) => (
                 <tr
                   key={member.id}
                   className="cursor-pointer border-b border-[#f0f1f3] last:border-0 hover:bg-[#fafbfc]"
@@ -263,34 +291,34 @@ const MemberListPage = () => {
                         </p>
 
                         <p className="mt-1 text-xs text-[#8b95a1]">
-                          {member.email}
+                          .
                         </p>
                       </div>
                     </div>
                   </td>
 
                   <td className="px-4 py-5 text-[#6b7684]">
-                    {member.phone}
+                    .
                   </td>
 
                   <td className="px-4 py-5">
-                    <GradeBadge grade={member.grade} />
+                    <GradeBadge grade={'일반'} />
                   </td>
 
                   <td className="px-4 py-5 text-[#4e5968]">
-                    {member.orders.toLocaleString()}건
+                    .건
                   </td>
 
                   <td className="px-4 py-5 font-medium text-[#333d4b]">
-                    {member.totalPurchase.toLocaleString()}원
+                    0원
                   </td>
 
                   <td className="px-4 py-5">
-                    <StatusBadge status={member.status} />
+                    <StatusBadge status={'정상'} />
                   </td>
 
                   <td className="whitespace-nowrap px-6 py-5 text-[#8b95a1]">
-                    {member.joinedAt}
+                    .
                   </td>
                 </tr>
               ))}
@@ -298,24 +326,10 @@ const MemberListPage = () => {
           </table>
 
           {/* Pagination */}
-          <div className="flex items-center justify-center gap-2 border-t border-[#f0f1f3] px-6 py-5">
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#191f28] text-xs font-semibold text-white">
-              1
-            </button>
-
-            {[2, 3, 4, 5].map((page) => (
-              <button
-                key={page}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-[#6b7684] hover:bg-[#f2f4f6]"
-              >
-                {page}
-              </button>
-            ))}
-
-            <button className="ml-1 flex h-8 w-8 items-center justify-center rounded-lg text-xs text-[#6b7684] hover:bg-[#f2f4f6]">
-              ›
-            </button>
-          </div>
+          <Pagination
+            currentPage={page}
+            totalPage={memberListView.totalPage}
+            onPageChange={setPage}/>
         </div>
       </div>
     </MainLayout>
