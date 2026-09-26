@@ -1,9 +1,39 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import MainLayout from '../../components/layout/MainLayout'
+import { useQuery } from '@tanstack/react-query'
+import { getMember, type MemberItem } from '../../api/member/MemberApi'
+import { useEffect, useState } from 'react'
 
 const MemberDetailPage = () => {
   const navigate = useNavigate()
   const { memberId } = useParams()
+
+    const [name, setName] = useState('')
+
+  const {
+    data: member,
+    isLoading
+  } = useQuery<MemberItem>({
+    queryKey:['member', memberId],
+    queryFn: () => getMember(Number(memberId)),
+    enabled: !!memberId
+  })
+
+  useEffect(() => {
+    if(member){
+      setName(member.name)
+    }
+  }, [member])
+
+  if (isLoading) {
+    return (
+      <MainLayout> 
+        <div className="p-8"> 
+          회원 정보를 불러오는 중... 
+        </div> 
+      </MainLayout > 
+    )
+  }
 
   return (
     <MainLayout>
@@ -55,7 +85,7 @@ const MemberDetailPage = () => {
 
               <div>
                 <h2 className="text-xl font-bold text-[#191f28]">
-                  김민수
+                  {name}
                 </h2>
 
                 <p className="mt-1 text-sm text-[#8b95a1]">

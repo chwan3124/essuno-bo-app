@@ -15,3 +15,8 @@ export const getMembers = async (page:number): Promise<MemberListView> => {
     const response = await ApiClient.get<MemberListView>(`/api/members?page=${page}`)
     return response.data.data;
 }
+
+export const getMember = async (id:number): Promise<MemberItem> => {
+    const response = await ApiClient.get<MemberListView>(`/api/member/${id}`)
+    return response.data.data;
+}

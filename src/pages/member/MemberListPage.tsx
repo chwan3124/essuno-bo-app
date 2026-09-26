@@ -3,6 +3,7 @@ import MainLayout from '../../components/layout/MainLayout'
 import { getMembers, type MemberListView } from '../../api/member/MemberApi'
 import { useState } from 'react'
 import Pagination from '../../components/Pagination'
+import { useNavigate } from 'react-router-dom'
 
 interface Member {
   id: number
@@ -98,7 +99,7 @@ const members: Member[] = [
 
 const MemberListPage = () => {
   const [page, setPage] = useState(1)
-
+  const navigate = useNavigate();
   const {
     data: memberListView = {
       members: [],
@@ -268,6 +269,7 @@ const MemberListPage = () => {
               {memberListView.members.map((member) => (
                 <tr
                   key={member.id}
+                  onClick={() => navigate(`/member/${member.id}`)}
                   className="cursor-pointer border-b border-[#f0f1f3] last:border-0 hover:bg-[#fafbfc]"
                 >
                   <td className="px-6 py-5">
