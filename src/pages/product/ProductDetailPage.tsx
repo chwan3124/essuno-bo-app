@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import MainLayout from '../../components/layout/MainLayout'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { getProduct, type ProductItem, updateProduct } from '../../api/product/ProductApi'
+import { type CategoryItem, getCategories, getProduct, type ProductItem, updateProduct } from '../../api/product/ProductApi'
 import { useState, useEffect } from 'react'
 
 
@@ -10,9 +10,11 @@ const ProductDetailPage = () => {
   const { productId } = useParams()
 
   const [name, setName] = useState('')
-  const [category, setCategory] = useState('')
   const [price, setPrice] = useState(0)
   const [stock, setStock] = useState(0)
+
+  const [parentCategoryId, setParentCategoryId] = useState<number | null>(null)
+  const [categoryId, setCategoryId] = useState<number | null>(null)
 
   const {
     data: product,
@@ -23,19 +25,32 @@ const ProductDetailPage = () => {
     enabled: !!productId,
   })
 
+
   useEffect(() => {
     if (product) {
       setName(product.name)
-      setCategory(product.category)
       setPrice(product.price)
       setStock(product.stock)
+      setParentCategoryId(product.parentCategoryId)
+      setCategoryId(product.categoryId)
     }
   }, [product])
+
+  const { data: parentCategories = [] } = useQuery<CategoryItem[]>({
+    queryKey: ['parentCategories'],
+    queryFn: () => getCategories(null),
+  })
+
+  const { data: childCategories = [] } = useQuery<CategoryItem[]>({
+    queryKey: ['childCategories', parentCategoryId],
+    queryFn: () => getCategories(parentCategoryId!),
+    enabled: parentCategoryId !== null,
+  })
 
   const updateMutation = useMutation({
     mutationFn: () => updateProduct(Number(productId), {
       name,
-      category,
+      categoryId,
       price,
       stock
     }),
@@ -159,17 +174,42 @@ const ProductDetailPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-[#4e5968]">
-                    카테고리
+                    메인 카테고리
                   </label>
 
                   <select 
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      value={parentCategoryId ?? ''}
+                      onChange={(e) => {
+                        setParentCategoryId(Number(e.target.value))
+                        setCategoryId(null)
+                      }}
                       className="h-11 w-full rounded-lg border border-[#e5e8eb] bg-white px-3 text-sm outline-none focus:border-[#3182f6]">
-                    <option>상의</option>
-                    <option>하의</option>
-                    <option>아우터</option>
-                    <option>잡화</option>
+                    {parentCategories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-[#4e5968]">
+                    서브 카테고리
+                  </label>
+
+                  <select
+                    value={categoryId ?? ''}
+                    onChange={(e) => setCategoryId(Number(e.target.value))}
+                    disabled={parentCategoryId === null}
+                    className="h-11 w-full rounded-lg border border-[#e5e8eb] bg-white px-3 text-sm outline-none focus:border-[#3182f6]"
+                  >
+                    <option value="">선택</option>
+
+                    {childCategories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

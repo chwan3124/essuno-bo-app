@@ -3,7 +3,8 @@ import ApiClient from "../../util/ApiClient"
 export interface ProductItem{
     id: number;
     name: string;
-    category:  string;
+    categoryId:  number;
+    parentCategoryId: number;
     price: number,
     stock: number,
     status: string,
@@ -28,7 +29,7 @@ export const getProduct = async (id: number): Promise<ProductItem> => {
 
 export interface UpdateProductRequest {
   name: string
-  category: string
+  categoryId: number | null
   price: number
   stock: number
 }
@@ -44,7 +45,7 @@ export const updateProduct = async (
 
 export interface CreateProductRequest {
     name: string
-    category: string
+    categoryId: number|null
     price: number
     stock: number
 }
@@ -54,4 +55,16 @@ export const createProduct = async (
 ) => {
     const response = await ApiClient.post(`/api/product`, data)
     return response.data
+}
+
+
+export interface CategoryItem {
+    id: number,
+    name: string,
+    type: string
+} 
+
+export const getCategories = async ( parentId : number | null): Promise<CategoryItem[]> => {
+    const response = await ApiClient.get<CategoryItem>(`/api/categories?parentId=${parentId == null ? '': parentId}`)
+    return response.data.data;
 }
