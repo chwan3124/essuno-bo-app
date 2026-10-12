@@ -32,6 +32,7 @@ export interface UpdateProductRequest {
   categoryId: number | null
   price: number
   stock: number
+  status: string
 }
 
 export const updateProduct = async (
@@ -48,6 +49,7 @@ export interface CreateProductRequest {
     categoryId: number|null
     price: number
     stock: number
+    status: string
 }
 
 export const createProduct = async (

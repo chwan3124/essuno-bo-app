@@ -12,13 +12,15 @@ const ProductCreatePage = () => {
   const [stock, setStock] = useState(0)
   const [parentCategoryId, setParentCategoryId] = useState<number | null>(null)
   const [categoryId, setCategoryId] = useState<number | null>(null)
+  const [status, setStatus] = useState('')
 
   const createMutation = useMutation({
     mutationFn: () => createProduct({
       name,
       categoryId,
       price,
-      stock
+      stock,
+      status
     }),
 
     onSuccess: () => {
@@ -178,10 +180,14 @@ const ProductCreatePage = () => {
                     판매 상태
                   </label>
 
-                  <select className="h-11 w-full rounded-lg border border-[#e5e8eb] bg-white px-3 text-sm outline-none focus:border-[#3182f6]">
-                    <option>판매중</option>
-                    <option>판매중지</option>
-                    <option>품절</option>
+                  <select 
+                    value={status ?? ''}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="h-11 w-full rounded-lg border border-[#e5e8eb] bg-white px-3 text-sm outline-none focus:border-[#3182f6]">
+                    <option value="">선택</option>
+                    <option value="S">판매중</option>
+                    <option value="N">판매중지</option>
+                    <option value="O">품절</option>
                   </select>
                 </div>
               </div>

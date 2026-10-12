@@ -170,7 +170,7 @@ const ProductListPage = () => {
                   </td>
 
                   <td className="px-4 py-5">
-                    판매중
+                    <ProductStatus status={product.status}/>
                   </td>
 
                   <td className="px-4 py-5 text-[#8b95a1]">
@@ -199,6 +199,16 @@ const ProductListPage = () => {
       </div>
     </MainLayout>
   )
+}
+
+const ProductStatus = ({
+  status
+}: {
+  status: string
+}) => {
+  if(status === 'S') return <span>판매중</span>
+  if(status === 'N') return <span>판매중지</span>
+  if(status === 'O') return <span>품절</span>
 }
 
 export default ProductListPage
