@@ -1,8 +1,11 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import MainLayout from '../../components/layout/MainLayout'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { type CategoryItem, getCategories, getProduct, type ProductItem, updateProduct } from '../../api/product/ProductApi'
+import { type CategoryItem, getCategories, getProduct, type ProductItem, type ProductOptionItem, updateProduct } from '../../api/product/ProductApi'
 import { useState, useEffect } from 'react'
+import ProductOptionModal, {
+  type ProductOption,
+} from './ProductOptionModal'
 
 
 const ProductDetailPage = () => {
@@ -16,6 +19,29 @@ const ProductDetailPage = () => {
 
   const [parentCategoryId, setParentCategoryId] = useState<number | null>(null)
   const [categoryId, setCategoryId] = useState<number | null>(null)
+
+  const [isOptionModalOpen, setIsOptionModalOpen] = useState(false)
+
+const [selectedOption, setSelectedOption] =
+  useState<ProductOptionItem | null>(null)
+
+const [options, setOptions] = useState<ProductOptionItem[]>([])
+
+const openOptionModal = (option: ProductOptionItem) => {
+  setSelectedOption(option)
+  setIsOptionModalOpen(true)
+}
+
+const handleOptionSave = (updatedOption: ProductOptionItem) => {
+  setOptions((prev) =>
+    prev.map((option) =>
+      option.id === updatedOption.id ? updatedOption : option
+    )
+  )
+
+  setIsOptionModalOpen(false)
+  setSelectedOption(null)
+}
 
   const {
     data: product,
@@ -35,6 +61,7 @@ const ProductDetailPage = () => {
       setParentCategoryId(product.parentCategoryId)
       setCategoryId(product.categoryId)
       setStatus(product.status)
+      setOptions(product.options)
     }
   }, [product])
 
@@ -321,41 +348,32 @@ const ProductDetailPage = () => {
               </thead>
 
               <tbody>
-                <tr className="border-b border-[#f0f1f3]">
-                  <td className="px-5 py-4">Black</td>
-                  <td className="px-5 py-4">M</td>
-                  <td className="px-5 py-4">0원</td>
-                  <td className="px-5 py-4">42개</td>
-                  <td className="px-5 py-4">
-                    <button className="text-[#6b7684] hover:text-[#191f28]">
-                      수정
-                    </button>
-                  </td>
-                </tr>
+                {options.map((option) => (
+                  <tr
+                    key={option.id}
+                    className="border-b border-[#f0f1f3]"
+                  >
+                    <td className="px-5 py-4">{option.name}</td>
 
-                <tr className="border-b border-[#f0f1f3]">
-                  <td className="px-5 py-4">Black</td>
-                  <td className="px-5 py-4">L</td>
-                  <td className="px-5 py-4">0원</td>
-                  <td className="px-5 py-4">38개</td>
-                  <td className="px-5 py-4">
-                    <button className="text-[#6b7684] hover:text-[#191f28]">
-                      수정
-                    </button>
-                  </td>
-                </tr>
+                    <td className="px-5 py-4">{option.size}</td>
 
-                <tr>
-                  <td className="px-5 py-4">White</td>
-                  <td className="px-5 py-4">M</td>
-                  <td className="px-5 py-4">0원</td>
-                  <td className="px-5 py-4">48개</td>
-                  <td className="px-5 py-4">
-                    <button className="text-[#6b7684] hover:text-[#191f28]">
-                      수정
-                    </button>
-                  </td>
-                </tr>
+                    <td className="px-5 py-4">
+                      {option.price.toLocaleString()}원
+                    </td>
+
+                    <td className="px-5 py-4">{option.stock}개</td>
+
+                    <td className="px-5 py-4">
+                      <button
+                        type="button"
+                        onClick={() => openOptionModal(option)}
+                        className="text-[#3182f6] hover:underline"
+                      >
+                        수정
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -420,6 +438,15 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+      <ProductOptionModal
+        isOpen={isOptionModalOpen}
+        option={selectedOption}
+        onClose={() => {
+          setIsOptionModalOpen(false)
+          setSelectedOption(null)
+        }}
+        onSave={handleOptionSave}
+      />
     </MainLayout>
   )
 }

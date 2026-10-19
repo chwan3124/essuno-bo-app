@@ -8,6 +8,7 @@ export interface ProductItem{
     price: number,
     stock: number,
     status: string,
+    options: ProductOptionItem[]
     createdAt: string,
 }
 
@@ -15,6 +16,14 @@ export interface ProductListView{
     totalCount: number;
     totalPage: number;
     products: ProductItem[];
+}
+
+export interface ProductOptionItem{
+    id: number;
+    name: string;
+    price:  number;
+    stock: number;
+    size: string,
 }
 
 export const getProducts = async (page:number): Promise<ProductListView> => {
