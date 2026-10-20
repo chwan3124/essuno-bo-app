@@ -27,21 +27,34 @@ const [selectedOption, setSelectedOption] =
 
 const [options, setOptions] = useState<ProductOptionItem[]>([])
 
-const openOptionModal = (option: ProductOptionItem) => {
-  setSelectedOption(option)
-  setIsOptionModalOpen(true)
+const openOptionModal = (option?: ProductOptionItem) => {
+  if(option != null ){
+    setSelectedOption(option)
+    setIsOptionModalOpen(true)
+  } else{
+    setSelectedOption(null)
+    setIsOptionModalOpen(true)
+  }
+  
 }
 
-const handleOptionSave = (updatedOption: ProductOptionItem) => {
-  setOptions((prev) =>
-    prev.map((option) =>
-      option.id === updatedOption.id ? updatedOption : option
-    )
-  )
+  const handleOptionSave = (updatedOption: ProductOptionItem) => {
+    if(selectedOption != null){
+      setOptions((prev) =>
+        prev.map((option) =>
+          option.id === updatedOption.id ? updatedOption : option
+        )
+      )
 
-  setIsOptionModalOpen(false)
-  setSelectedOption(null)
-}
+      setIsOptionModalOpen(false)
+      setSelectedOption(null)
+    } else{
+      setOptions((prev) => [...prev, updatedOption])
+
+      setIsOptionModalOpen(false)
+      setSelectedOption(null)
+    }
+  }
 
   const {
     data: product,
@@ -82,7 +95,8 @@ const handleOptionSave = (updatedOption: ProductOptionItem) => {
       categoryId,
       price,
       stock,
-      status
+      status,
+      options
     }),
 
     onSuccess: () => {
@@ -329,6 +343,7 @@ const handleOptionSave = (updatedOption: ProductOptionItem) => {
 
             <button
               type="button"
+              onClick={() => openOptionModal()}
               className="rounded-lg border border-[#e5e8eb] px-4 py-2 text-sm font-semibold text-[#4e5968] hover:bg-[#f7f8fa]"
             >
               옵션 추가

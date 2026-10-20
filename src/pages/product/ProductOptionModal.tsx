@@ -10,11 +10,11 @@ onSave: (option: ProductOptionItem) => void
 }
 
 const ProductOptionModal = ({
-isOpen,
-option,
-onClose,
-onSave,
-}: ProductOptionModalProps) => {
+    isOpen,
+    option,
+    onClose,
+    onSave,
+  }: ProductOptionModalProps) => {
 const [color, setColor] = useState('')
 const [size, setSize] = useState('')
 const [price, setPrice] = useState(0)
@@ -22,40 +22,39 @@ const [stock, setStock] = useState(0)
 
 useEffect(() => {
   if (option) {
-  setColor(option.name)
-  setSize(option.size)
-  setPrice(option.price)
-  setStock(option.stock)
+    setColor(option.name)
+    setSize(option.size)
+    setPrice(option.price)
+    setStock(option.stock)
   }
   }, [option])
 
-  if (!isOpen || !option) return null
+  if (!isOpen) return null
 
   const handleSave = () => {
-  if (color.trim() === '' || size.trim() === '') {
-  alert('색상과 사이즈를 입력해 주세요.')
-  return
+      if (color.trim() === '' || size.trim() === '') {
+      alert('색상과 사이즈를 입력해 주세요.')
+      return
+    }
+
+    if (
+      !Number.isFinite(price) ||
+      price < 0 ||
+      !Number.isInteger(stock) ||
+      stock < 0
+    ) {
+      alert('금액과 재고를 올바르게 입력해 주세요.')
+      return
+    }
+
+    onSave({
+      id: option == null ? undefined : option.id,
+      name: color.trim(),
+      size: size.trim(),
+      price,
+      stock,
+    })
   }
-
-  if (
-    !Number.isFinite(price) ||
-    price < 0 ||
-    !Number.isInteger(stock) ||
-    stock < 0
-  ) {
-    alert('금액과 재고를 올바르게 입력해 주세요.')
-    return
-  }
-
-  onSave({
-    id: option.id,
-    name: color.trim(),
-    size: size.trim(),
-    price,
-    stock,
-  })
-
-}
 
 return (
     <div

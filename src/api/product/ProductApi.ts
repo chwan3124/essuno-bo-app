@@ -19,6 +19,14 @@ export interface ProductListView{
 }
 
 export interface ProductOptionItem{
+    id?: number;
+    name: string;
+    price:  number;
+    stock: number;
+    size: string,
+}
+
+export interface ProductOptionUpdateRequest{
     id: number;
     name: string;
     price:  number;
@@ -42,6 +50,7 @@ export interface UpdateProductRequest {
   price: number
   stock: number
   status: string
+  options: ProductOptionItem[]
 }
 
 export const updateProduct = async (
