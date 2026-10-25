@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom'
 import MainLayout from '../../components/layout/MainLayout'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createProduct, getCategories, type CategoryItem } from '../../api/product/ProductApi'
+import { createProduct, getCategories, type CategoryItem, type ProductOptionItem } from '../../api/product/ProductApi'
+import ProductOptionModal from './ProductOptionModal'
 
 
 const ProductCreatePage = () => {
@@ -13,6 +14,11 @@ const ProductCreatePage = () => {
   const [parentCategoryId, setParentCategoryId] = useState<number | null>(null)
   const [categoryId, setCategoryId] = useState<number | null>(null)
   const [status, setStatus] = useState('')
+  const [selectedOption, setSelectedOption] =
+    useState<ProductOptionItem | null>(null)
+  
+  const [options, setOptions] = useState<ProductOptionItem[]>([])
+  const [isOptionModalOpen, setIsOptionModalOpen] = useState(false)
 
   const createMutation = useMutation({
     mutationFn: () => createProduct({
@@ -20,7 +26,8 @@ const ProductCreatePage = () => {
       categoryId,
       price,
       stock,
-      status
+      status,
+      options
     }),
 
     onSuccess: () => {
@@ -45,6 +52,34 @@ const ProductCreatePage = () => {
     queryFn: () => getCategories(parentCategoryId!),
     enabled: parentCategoryId !== null,
   })
+
+  const openOptionModal = (option?: ProductOptionItem) => {
+    if(option != null ){
+      setSelectedOption(option)
+      setIsOptionModalOpen(true)
+    } else{
+      setSelectedOption(null)
+      setIsOptionModalOpen(true)
+    }
+  }
+
+  const handleOptionSave = (updatedOption: ProductOptionItem) => {
+    if(selectedOption != null){
+      setOptions((prev) =>
+        prev.map((option) =>
+          option.id === updatedOption.id ? updatedOption : option
+        )
+      )
+
+      setIsOptionModalOpen(false)
+      setSelectedOption(null)
+    } else{
+      setOptions((prev) => [...prev, updatedOption])
+
+      setIsOptionModalOpen(false)
+      setSelectedOption(null)
+    }
+  }
 
   return (
     <MainLayout>
@@ -261,6 +296,7 @@ const ProductCreatePage = () => {
 
             <button
               type="button"
+              onClick={() => openOptionModal()}
               className="rounded-lg border border-[#e5e8eb] px-4 py-2 text-sm font-semibold text-[#4e5968] hover:bg-[#f7f8fa]"
             >
               옵션 추가
@@ -280,41 +316,32 @@ const ProductCreatePage = () => {
               </thead>
 
               <tbody>
-                <tr className="border-b border-[#f0f1f3]">
-                  <td className="px-5 py-4">Black</td>
-                  <td className="px-5 py-4">M</td>
-                  <td className="px-5 py-4">0원</td>
-                  <td className="px-5 py-4">42개</td>
-                  <td className="px-5 py-4">
-                    <button className="text-[#6b7684] hover:text-[#191f28]">
-                      수정
-                    </button>
-                  </td>
-                </tr>
+                {options.map((option) => (
+                  <tr
+                    key={option.id}
+                    className="border-b border-[#f0f1f3]"
+                  >
+                    <td className="px-5 py-4">{option.name}</td>
 
-                <tr className="border-b border-[#f0f1f3]">
-                  <td className="px-5 py-4">Black</td>
-                  <td className="px-5 py-4">L</td>
-                  <td className="px-5 py-4">0원</td>
-                  <td className="px-5 py-4">38개</td>
-                  <td className="px-5 py-4">
-                    <button className="text-[#6b7684] hover:text-[#191f28]">
-                      수정
-                    </button>
-                  </td>
-                </tr>
+                    <td className="px-5 py-4">{option.size}</td>
 
-                <tr>
-                  <td className="px-5 py-4">White</td>
-                  <td className="px-5 py-4">M</td>
-                  <td className="px-5 py-4">0원</td>
-                  <td className="px-5 py-4">48개</td>
-                  <td className="px-5 py-4">
-                    <button className="text-[#6b7684] hover:text-[#191f28]">
-                      수정
-                    </button>
-                  </td>
-                </tr>
+                    <td className="px-5 py-4">
+                      {option.price.toLocaleString()}원
+                    </td>
+
+                    <td className="px-5 py-4">{option.stock}개</td>
+
+                    <td className="px-5 py-4">
+                      <button
+                        type="button"
+                        onClick={() => openOptionModal(option)}
+                        className="text-[#3182f6] hover:underline"
+                      >
+                        수정
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -378,6 +405,15 @@ const ProductCreatePage = () => {
           </div>
         </div>
       </div>
+       <ProductOptionModal
+        isOpen={isOptionModalOpen}
+        option={selectedOption}
+        onClose={() => {
+          setIsOptionModalOpen(false)
+          setSelectedOption(null)
+        }}
+        onSave={handleOptionSave}
+      />
     </MainLayout>
   )
 }

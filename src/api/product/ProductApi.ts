@@ -68,6 +68,7 @@ export interface CreateProductRequest {
     price: number
     stock: number
     status: string
+    options: ProductOptionItem[]
 }
 
 export const createProduct = async (
